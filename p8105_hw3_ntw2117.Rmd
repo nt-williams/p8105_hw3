@@ -1,0 +1,17 @@
+---
+title: "P8105 (Data Science I): Homework 3"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+theme_set(theme_bw())
+```
+
+## Problem 1
+
+## Problem 2
+
+## Problem 3
