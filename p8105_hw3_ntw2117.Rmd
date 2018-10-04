@@ -12,6 +12,29 @@ theme_set(theme_bw())
 
 ## Problem 1
 
+#### Importing and cleaning BRFSS data 
+
+```{r}
+brfss_data <- p8105.datasets::brfss_smart2010 %>% 
+  janitor::clean_names()
+
+brfss_data <- brfss_data %>% 
+  rename(state = locationabbr, 
+         location = locationdesc) %>% 
+  filter(topic == "Overall Health") %>% 
+  mutate(response = as.factor(response))
+```
+
+#### Questions and plots
+
+```{r}
+brfss_data %>% 
+  filter(year == 2002) %>% 
+  distinct(state, location) %>% 
+  count(state) %>% 
+  filter(n == 7)
+```
+
 ## Problem 2
 
 ## Problem 3
