@@ -32,8 +32,17 @@ brfss_data %>%
   filter(year == 2002) %>% 
   distinct(state, location) %>% 
   count(state) %>% 
-  filter(n == 7)
+  filter(n == 7) 
 ```
+
+```{r}
+brfss_data %>% 
+  group_by(state, year) %>% 
+  summarize(n_obs = n()) %>% 
+  ggplot(aes(x = year, y = n_obs, color = state)) + 
+    geom_line()
+```
+
 
 ## Problem 2
 
