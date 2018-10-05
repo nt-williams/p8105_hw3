@@ -14,7 +14,7 @@ theme_set(theme_bw())
 
 #### Importing and cleaning BRFSS data 
 
-```{r}
+```{r importing brfss data}
 brfss_data <- p8105.datasets::brfss_smart2010 %>% 
   janitor::clean_names()
 
@@ -27,7 +27,7 @@ brfss_data <- brfss_data %>%
 
 #### Questions and plots
 
-```{r}
+```{r calculating 7 obs in 2002}
 brfss_data %>% 
   filter(year == 2002) %>% 
   distinct(state, location) %>% 
@@ -35,15 +35,30 @@ brfss_data %>%
   filter(n == 7) 
 ```
 
-```{r}
+> insert answers to data description problems 
+
+```{r creating spaghetti plot, fig.width = 9, fig.height = 7}
 brfss_data %>% 
   group_by(state, year) %>% 
   summarize(n_obs = n()) %>% 
-  ggplot(aes(x = year, y = n_obs, color = state)) + 
-    geom_line()
+  ggplot(aes(x = year, y = n_obs)) + 
+    geom_line(aes(color = state)) + 
+    viridis::scale_color_viridis(
+      name = "", 
+      discrete = TRUE) +
+    labs(x = "Year", 
+         y = "Number of observations") + 
+    theme(legend.position = "bottom", 
+          legend.direction = "horizontal") + 
+    guides(color = guide_legend(ncol = 14))
 ```
 
-
 ## Problem 2
+
+```{r}
+insta_data <- p8105.datasets::instacart %>% 
+  janitor::clean_names()
+```
+
 
 ## Problem 3
