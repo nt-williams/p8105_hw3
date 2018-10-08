@@ -35,10 +35,10 @@ brfss_data %>%
   filter(year == 2002) %>% 
   distinct(state, location) %>% 
   count(state) %>% 
-  filter(n == 7) 
+  filter(n == 7)
 ```
 
-> insert answers to data description problems 
+- In 2002, the states Connecticut, Florida, and North Carolina were observed at 7 locations. 
 
 ```{r creating spaghetti plot, fig.width = 9, fig.height = 7}
 brfss_data %>% 
@@ -64,11 +64,10 @@ brfss_data %>%
   janitor::clean_names() %>% 
   mutate(prop_excel =  (excellent) / (excellent + fair + good + poor + very_good)) %>% 
   group_by(year) %>% 
-  summarize(avg_prop_excel = mean(prop_excel), 
-            sd_prop_excel = sd(prop_excel)) %>% 
+  summarize("Average proportion excellent" = round(mean(prop_excel), 4), 
+            "Standard deviation" = round(sd(prop_excel), 4)) %>% 
   knitr::kable()
 ```
-
 
 ```{r average proportion, response category across location by state, warning = FALSE, fig.width = 9, fig.height = 10}
 library(patchwork)
@@ -172,6 +171,31 @@ poor_dist / fair_dist / good_dist / v_good_dist / excel_dist
 insta_data <- p8105.datasets::instacart %>% 
   janitor::clean_names()
 ```
+
+```{r aisles information}
+insta_data %>% 
+  distinct(aisle_id) %>% 
+  count()
+
+numb_orders <- insta_data %>%
+  group_by(aisle) %>%
+  summarize(n = n()) %>%
+  arrange(desc(n))
+```
+
+```{r items ordered in each aisle, fig.height = 15, fig.width = 8, fig.align = "center"}
+numb_orders %>% 
+  mutate(aisle = forcats::fct_reorder(aisle, n, .desc = TRUE)) %>% 
+  ggplot(aes(x = aisle, y = n)) + 
+  coord_flip() + 
+  geom_bar(stat = "identity") +
+    labs(y = "Number of Orders", 
+        x = "Aisle") + 
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) 
+```
+
+
 
 
 ## Problem 3
