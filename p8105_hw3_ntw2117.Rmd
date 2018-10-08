@@ -6,7 +6,6 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-extrafont::loadfonts(device="win")
 
 theme_set(theme_bw())
 ```
@@ -23,6 +22,9 @@ brfss_data <- brfss_data %>%
   rename(state = locationabbr, 
          location = locationdesc) %>% 
   filter(topic == "Overall Health") %>% 
+  select(-(class:question), 
+                       -sample_size, 
+                       -(confidence_limit_low:geo_location)) %>% 
   mutate(response = as.factor(response))
 ```
 
@@ -54,6 +56,20 @@ brfss_data %>%
     guides(color = guide_legend(ncol = 17))
 ```
 
+```{r table proportion excellent responses NY 2002/06/10}
+brfss_data %>% 
+  filter(year %in% c(2002, 2006, 2010), 
+         state == "NY") %>% 
+  spread(key = response, value = data_value) %>% 
+  janitor::clean_names() %>% 
+  mutate(prop_excel =  (excellent) / (excellent + fair + good + poor + very_good)) %>% 
+  group_by(year) %>% 
+  summarize(avg_prop_excel = mean(prop_excel), 
+            sd_prop_excel = sd(prop_excel)) %>% 
+  knitr::kable()
+```
+
+
 ```{r average proportion, response category across location by state, warning = FALSE, fig.width = 9, fig.height = 10}
 library(patchwork)
 
@@ -68,78 +84,83 @@ poor_dist <- avg_response_year_state %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5) + 
     geom_text(x = 0, y = 0.40, 
-              label = "Poor", 
-              size = 5) + 
+              label = "Poor") + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
+    viridis::scale_fill_viridis(discrete = TRUE, 
+                                option = "magma",
+                                guide = FALSE) + 
     theme(axis.text.x = element_blank(), 
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) + 
-    labs(y = "", x = "") +
-    scale_fill_discrete(guide = FALSE) 
+    labs(y = "", x = "")
 
 fair_dist <- avg_response_year_state %>%
   filter(response == "Fair") %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5) +
     geom_text(x = 0, y = 0.15, 
-              label = "Fair",
-              size = 5) + 
+              label = "Fair") + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
+    viridis::scale_fill_viridis(discrete = TRUE, 
+                                option = "magma",
+                                guide = FALSE) + 
     theme(axis.text.x = element_blank(), 
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) + 
-    labs(y = "", x = "") +
-    scale_fill_discrete(guide = FALSE) +
-    viridis::scale_color_viridis(discrete = TRUE)
+    labs(y = "", x = "")
 
 good_dist <- avg_response_year_state %>%
   filter(response == "Good") %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5) +
     geom_text(x = 0, y = 0.15, 
-              label = "Good", 
-              size = 5) + 
+              label = "Good") + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
+    viridis::scale_fill_viridis(discrete = TRUE, 
+                                option = "magma", 
+                                guide = FALSE) + 
     theme(axis.text.x = element_blank(), 
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) + 
-    labs(y = "", x = "") +
-    scale_fill_discrete(guide = FALSE)
+          panel.grid.minor = element_blank()) +
+    labs(y = "", x = "") 
 
 v_good_dist <- avg_response_year_state %>%
   filter(response == "Very good") %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5) +
     geom_text(x = 1, y = 0.125, 
-              label = "Very good", 
-              size = 5) + 
+              label = "Very good") + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
+    viridis::scale_fill_viridis(discrete = TRUE, 
+                                option = "magma",
+                                guide = FALSE) + 
     theme(axis.text.x = element_blank(), 
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) + 
-    labs(y = "", x = "") +
-    scale_fill_discrete(guide = FALSE)
+    labs(y = "", x = "")
 
 excel_dist <- avg_response_year_state %>%
   filter(response == "Excellent") %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5) +
     geom_text(x = 1, y = 0.15, 
-              label = "Excellent", 
-              size = 5) + 
+              label = "Excellent") + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
-    labs(y = "", x = "Response percentage") +
-    scale_fill_discrete(name = "Year") +
+    labs(y = "", x = "Response proportion") +
+    viridis::scale_fill_viridis(name = "Year",
+                                discrete = TRUE, 
+                                option = "magma") + 
     theme(legend.position = "bottom",
           legend.direction = "horizontal", 
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) + 
-    guides(fill = guide_legend(ncol = 10))
+    guides(fill = guide_legend(ncol = 10)) 
+    
 
 poor_dist / fair_dist / good_dist / v_good_dist / excel_dist
 ```
