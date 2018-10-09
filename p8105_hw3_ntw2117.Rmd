@@ -69,7 +69,7 @@ brfss_data %>%
   knitr::kable()
 ```
 
-```{r average proportion, response category across location by state, warning = FALSE, fig.height = 10, fig.align = "center"}
+```{r average proportion, response category across location by state, warning = FALSE, fig.height = 8, fig.align = "center", dpi = 300}
 library(patchwork)
 
 avg_response_year_state <- 
@@ -81,9 +81,9 @@ avg_response_year_state <-
 poor_dist <- avg_response_year_state %>%
   filter(response == "Poor") %>%
   ggplot(aes(x = avg_response, fill = year)) +
-    geom_density(alpha = 0.5) + 
+    geom_density(alpha = 0.5, color = NA) + 
     geom_text(x = 0, y = 0.40, 
-              label = "Poor") + 
+              label = "Poor", size = 3.5) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -97,9 +97,9 @@ poor_dist <- avg_response_year_state %>%
 fair_dist <- avg_response_year_state %>%
   filter(response == "Fair") %>%
   ggplot(aes(x = avg_response, fill = year)) +
-    geom_density(alpha = 0.5) +
+    geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 0, y = 0.15, 
-              label = "Fair") + 
+              label = "Fair", size = 3.5) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -113,9 +113,9 @@ fair_dist <- avg_response_year_state %>%
 good_dist <- avg_response_year_state %>%
   filter(response == "Good") %>%
   ggplot(aes(x = avg_response, fill = year)) +
-    geom_density(alpha = 0.5) +
+    geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 0, y = 0.15, 
-              label = "Good") + 
+              label = "Good", size = 3.5) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -129,9 +129,9 @@ good_dist <- avg_response_year_state %>%
 v_good_dist <- avg_response_year_state %>%
   filter(response == "Very good") %>%
   ggplot(aes(x = avg_response, fill = year)) +
-    geom_density(alpha = 0.5) +
+    geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 1, y = 0.125, 
-              label = "Very good") + 
+              label = "Very good", size = 3.5) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -145,9 +145,9 @@ v_good_dist <- avg_response_year_state %>%
 excel_dist <- avg_response_year_state %>%
   filter(response == "Excellent") %>%
   ggplot(aes(x = avg_response, fill = year)) +
-    geom_density(alpha = 0.5) +
+    geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 1, y = 0.15, 
-              label = "Excellent") + 
+              label = "Excellent", size = 3.5) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     labs(y = "", x = "Response proportion") +
@@ -183,7 +183,7 @@ numb_orders <- insta_data %>%
   arrange(desc(n))
 ```
 
-```{r items ordered in each aisle, fig.height = 15, fig.align = "center"}
+```{r items ordered in each aisle, fig.height = 15, fig.align = "center", dpi = 300}
 numb_orders %>% 
   mutate(aisle = forcats::fct_reorder(aisle, n, .desc = TRUE)) %>% 
   ggplot(aes(x = aisle, y = n)) + 
@@ -206,3 +206,21 @@ insta_data %>%
 ```
 
 ## Problem 3
+
+```{r importing and cleaning NY NOAA data}
+noaa_data <- p8105.datasets::ny_noaa %>% 
+  janitor::clean_names() %>% 
+  separate(date, c("year", "month", "day"), sep = "-") %>% 
+  mutate(tmax = as.double(tmax) / 10, 
+         tmin = as.double(tmin) / 10, 
+         prcp = prcp / 10,
+         month = month.name[as.integer(month)])
+```
+
+```{r}
+noaa_data %>% 
+  group_by(month) %>% 
+  summarize(avg_snow = round(mean(snow, na.rm = TRUE), 4))
+```
+
+
