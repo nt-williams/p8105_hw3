@@ -200,7 +200,7 @@ insta_data %>%
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
   select(product_name, order_dow, order_hour_of_day) %>% 
   group_by(product_name, order_dow) %>% 
-  summarize(avg_hour = mean(order_hour_of_day)) %>%
+  summarize(avg_hour = round(mean(order_hour_of_day)), 4) %>%
   spread(key = order_dow, value = avg_hour) %>% 
   knitr::kable()
 ```
@@ -214,13 +214,27 @@ noaa_data <- p8105.datasets::ny_noaa %>%
   mutate(tmax = as.double(tmax) / 10, 
          tmin = as.double(tmin) / 10, 
          prcp = prcp / 10,
-         month = month.name[as.integer(month)])
+         month = month.name[as.integer(month)], 
+         year = as.integer(year))
 ```
 
-```{r}
+```{r average snow}
 noaa_data %>% 
   group_by(month) %>% 
   summarize(avg_snow = round(mean(snow, na.rm = TRUE), 4))
 ```
 
+```{r dpi = 300,fig.align = "center"}
+avg_daily_temp <- noaa_data %>%
+  filter(month %in% c("January", "July")) %>%
+  mutate(avg_temp = (tmin + tmax) / 2)
+
+avg_daily_temp %>% 
+  filter(month %in% c("January", "July")) %>% 
+  group_by(year, month) %>% 
+  summarize(avg_temp = mean(avg_temp, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = avg_temp)) + 
+    geom_line(color = "red", size = 1) + 
+  facet_grid(~ month, scales = "free")
+```
 
