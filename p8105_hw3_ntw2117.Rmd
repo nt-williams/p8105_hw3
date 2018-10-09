@@ -183,16 +183,26 @@ numb_orders <- insta_data %>%
   arrange(desc(n))
 ```
 
-```{r items ordered in each aisle, fig.height = 15, fig.width = 8, fig.align = "center"}
+```{r items ordered in each aisle, fig.height = 15, out.width = "85%", fig.align = "center"}
 numb_orders %>% 
   mutate(aisle = forcats::fct_reorder(aisle, n, .desc = TRUE)) %>% 
   ggplot(aes(x = aisle, y = n)) + 
   coord_flip() + 
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", fill = "#456355") +
     labs(y = "Number of Orders", 
         x = "Aisle") + 
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) 
+```
+
+```{r mean hour of the day}
+insta_data %>% 
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
+  select(product_name, order_dow, order_hour_of_day) %>% 
+  group_by(product_name, order_dow) %>% 
+  summarize(avg_hour = mean(order_hour_of_day)) %>%
+  spread(key = order_dow, value = avg_hour) %>% 
+  knitr::kable()
 ```
 
 
