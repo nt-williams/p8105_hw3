@@ -40,7 +40,7 @@ brfss_data %>%
 
 - In 2002, the states Connecticut, Florida, and North Carolina were observed at 7 locations. 
 
-```{r creating spaghetti plot, fig.width = 9, fig.height = 7}
+```{r creating spaghetti plot, fig.height = 7, fig.width = 9, fig.align = "center"}
 brfss_data %>% 
   group_by(state, year) %>% 
   summarize(n_obs = n()) %>% 
@@ -56,7 +56,7 @@ brfss_data %>%
     guides(color = guide_legend(ncol = 17))
 ```
 
-```{r table proportion excellent responses NY 2002/06/10}
+```{r table proportion excellent responses NY 2002/06/10, fig.align = "center"}
 brfss_data %>% 
   filter(year %in% c(2002, 2006, 2010), 
          state == "NY") %>% 
@@ -69,7 +69,7 @@ brfss_data %>%
   knitr::kable()
 ```
 
-```{r average proportion, response category across location by state, warning = FALSE, fig.width = 9, fig.height = 10}
+```{r average proportion, response category across location by state, warning = FALSE, fig.height = 10, fig.align = "center"}
 library(patchwork)
 
 avg_response_year_state <- 
@@ -183,7 +183,7 @@ numb_orders <- insta_data %>%
   arrange(desc(n))
 ```
 
-```{r items ordered in each aisle, fig.height = 15, out.width = "85%", fig.align = "center"}
+```{r items ordered in each aisle, fig.height = 15, fig.align = "center"}
 numb_orders %>% 
   mutate(aisle = forcats::fct_reorder(aisle, n, .desc = TRUE)) %>% 
   ggplot(aes(x = aisle, y = n)) + 
@@ -204,8 +204,5 @@ insta_data %>%
   spread(key = order_dow, value = avg_hour) %>% 
   knitr::kable()
 ```
-
-
-
 
 ## Problem 3
