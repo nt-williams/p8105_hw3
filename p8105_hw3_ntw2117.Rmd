@@ -7,7 +7,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
-theme_set(theme_bw(base_size = 10))
+theme_set(theme_bw(base_size = 8))
 ```
 
 ## Problem 1
@@ -40,7 +40,7 @@ brfss_data %>%
 
 - In 2002, the states Connecticut, Florida, and North Carolina were observed at 7 locations. 
 
-```{r creating spaghetti plot, fig.height = 7, fig.width = 9, fig.align = "center"}
+```{r creating spaghetti plot, fig.height = 7, fig.width = 9, fig.align = "center", dpi = 300}
 brfss_data %>% 
   group_by(state, year) %>% 
   summarize(n_obs = n()) %>% 
@@ -48,7 +48,8 @@ brfss_data %>%
     geom_line(aes(color = state)) + 
     viridis::scale_color_viridis(
       name = "", 
-      discrete = TRUE) +
+      discrete = TRUE, 
+      option = "magma") +
     labs(x = "Year", 
          y = "Number of observations") + 
     theme(legend.position = "bottom", 
@@ -69,7 +70,7 @@ brfss_data %>%
   knitr::kable()
 ```
 
-```{r average proportion, response category across location by state, warning = FALSE, fig.height = 8, fig.align = "center", dpi = 300}
+```{r average proportion response category across location by state, warning = FALSE, fig.height = 8, fig.align = "center", dpi = 300}
 library(patchwork)
 
 avg_response_year_state <- 
@@ -167,7 +168,7 @@ poor_dist / fair_dist / good_dist / v_good_dist / excel_dist
 
 ## Problem 2
 
-```{r}
+```{r importing insta cart data}
 insta_data <- p8105.datasets::instacart %>% 
   janitor::clean_names()
 ```
@@ -188,7 +189,7 @@ numb_orders %>%
   mutate(aisle = forcats::fct_reorder(aisle, n, .desc = TRUE)) %>% 
   ggplot(aes(x = aisle, y = n)) + 
   coord_flip() + 
-  geom_bar(stat = "identity", fill = "#456355") +
+  geom_bar(stat = "identity", fill = "#a888bd") +
     labs(y = "Number of Orders", 
         x = "Aisle") + 
     theme(panel.grid.major = element_blank(), 
