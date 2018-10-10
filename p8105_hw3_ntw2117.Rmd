@@ -7,7 +7,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
-theme_set(theme_bw())
+theme_set(theme_bw(base_size = 10))
 ```
 
 ## Problem 1
@@ -83,7 +83,7 @@ poor_dist <- avg_response_year_state %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5, color = NA) + 
     geom_text(x = 0, y = 0.40, 
-              label = "Poor", size = 3.5) + 
+              label = "Poor", size = 3) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -99,7 +99,7 @@ fair_dist <- avg_response_year_state %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 0, y = 0.15, 
-              label = "Fair", size = 3.5) + 
+              label = "Fair", size = 3) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -115,7 +115,7 @@ good_dist <- avg_response_year_state %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 0, y = 0.15, 
-              label = "Good", size = 3.5) + 
+              label = "Good", size = 3) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -131,7 +131,7 @@ v_good_dist <- avg_response_year_state %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 1, y = 0.125, 
-              label = "Very good", size = 3.5) + 
+              label = "Very good", size = 3) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     viridis::scale_fill_viridis(discrete = TRUE, 
@@ -147,7 +147,7 @@ excel_dist <- avg_response_year_state %>%
   ggplot(aes(x = avg_response, fill = year)) +
     geom_density(alpha = 0.5, color = NA) +
     geom_text(x = 1, y = 0.15, 
-              label = "Excellent", size = 3.5) + 
+              label = "Excellent", size = 3) + 
     scale_x_continuous(limits = c(0, 45), 
                        breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45)) + 
     labs(y = "", x = "Response proportion") +
@@ -195,6 +195,16 @@ numb_orders %>%
           panel.grid.minor = element_blank()) 
 ```
 
+```{r most popular items in 3 aisles}
+insta_data %>% 
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(n = n()) %>% 
+  filter(n == max(n)) %>% 
+  knitr::kable()
+```
+
+
 ```{r mean hour of the day}
 insta_data %>% 
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
@@ -224,7 +234,7 @@ noaa_data %>%
   summarize(avg_snow = round(mean(snow, na.rm = TRUE), 4))
 ```
 
-```{r dpi = 300,fig.align = "center", fig.retina = 1}
+```{r average daily temp plot in january and july, dpi = 300,fig.align = "center", fig.retina = 1, fig.asp = .6}
 avg_daily_temp <- noaa_data %>%
   filter(month %in% c("January", "July")) %>%
   mutate(avg_temp = (tmin + tmax) / 2)
@@ -238,11 +248,13 @@ avg_daily_temp %>%
   facet_grid(~ month, 
              scales = "free") + 
   labs(x = "Year", 
-       y = "Average Daily Temperature (degrees C)") + 
+       y = "Average Daily Temperature (°C)") +
   theme(axis.text.x = element_text(angle = 45,
                                    vjust = 0.4), 
         strip.background = element_rect(fill = "black"), 
         strip.text = element_text(color = "white", 
                                   face = "bold"))
 ```
+
+
 
