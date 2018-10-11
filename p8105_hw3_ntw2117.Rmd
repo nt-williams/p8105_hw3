@@ -188,19 +188,38 @@ Figure 2 shows density plots of the different response categories from 2002 to 2
 
 ```{r importing insta cart data}
 insta_data <- p8105.datasets::instacart %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  mutate(order_dow = order_dow + 1)
+
+days <- c("Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday")
+
+insta_data$order_dow <- days[insta_data$order_dow]
+
+
+insta_data$order_dow <- fct_relevel(insta_data$order_dow,
+                                    "Sunday",
+                                    "Monday",
+                                    "Tuesday",
+                                    "Wednesday",
+                                    "Thursday",
+                                    "Friday",
+                                    "Saturday")
 ```
 
 ```{r aisles information}
-insta_data %>% 
-  distinct(aisle_id) %>% 
-  count()
-
 numb_orders <- insta_data %>%
   group_by(aisle) %>%
   summarize(n = n()) %>%
   arrange(desc(n))
 ```
+
+There are `r insta_data %>% distinct(aisle_id) %>% count()` aisles in the dataset. 
 
 ```{r items ordered in each aisle, fig.height = 15, fig.align = "center", dpi = 300}
 numb_orders %>% 
@@ -228,9 +247,10 @@ insta_data %>%
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
   select(product_name, order_dow, order_hour_of_day) %>% 
   group_by(product_name, order_dow) %>% 
-  summarize(avg_hour = round(mean(order_hour_of_day)), 4) %>%
+  summarize(avg_hour = mean(order_hour_of_day)) %>%
   spread(key = order_dow, value = avg_hour) %>% 
-  knitr::kable()
+  rename("Product Name" = product_name) %>% 
+  knitr::kable(align = "c")
 ```
 
 ## Problem 3
@@ -297,7 +317,8 @@ snow_1981_2010 <- noaa_data %>%
     viridis::scale_fill_viridis(name = "Year", 
                                 discrete = TRUE) + 
     viridis::scale_color_viridis(name = "Year",
-                                 discrete = TRUE) + 
+                                 discrete = TRUE, 
+                                 option = "inferno") + 
     labs(x = "Snowfall", 
          y = "Density") + 
     theme(legend.position = "bottom", 
