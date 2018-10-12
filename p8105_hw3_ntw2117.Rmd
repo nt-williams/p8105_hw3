@@ -84,7 +84,7 @@ brfss_data %>%
 
 Table 2 contains the average proportion of excellent responses across locations in New York for 2002, 2006, and 2010. A small decrease is observed from 2002 to 2006 and then remains constant from 2006 to 2010. The standard error decreases in 2010, most likely indicating that more responses were collected that year. 
 
-```{r average proportion response category across location by state, warning = FALSE, fig.height = 8, fig.align = "center", dpi = 300}
+```{r average proportion response category across location by state, warning = FALSE, fig.height = 7, fig.align = "center", dpi = 300, out.width = "100%"}
 library(patchwork)
 
 avg_response_year_state <- 
@@ -227,11 +227,14 @@ numb_orders %>%
   ggplot(aes(x = aisle, y = n)) + 
   coord_flip() + 
   geom_bar(stat = "identity", fill = "#a888bd") +
-    labs(y = "Number of Orders", 
-        x = "Aisle") + 
+    labs(title = "Figure 3: Number of orders across all aisles", 
+         y = "Number of Orders", 
+         x = "Aisle") + 
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) 
 ```
+
+Figure 3 shows the number of orders across all aisles, order from least to most. Fresh vegetables and fresh fruits are ordered most with `r max(numb_orders$n)` and `r numb_orders %>% filter(aisle == "fresh fruits") %>% select(n)` orders respectively. Followed by packaged vegetables and fruits. The least ordered items are those coming from the beauty aisle, `r min(numb_orders$n)` orders. 
 
 ```{r most popular items in 3 aisles}
 insta_data %>% 
@@ -239,6 +242,9 @@ insta_data %>%
   group_by(aisle, product_name) %>% 
   summarize(n = n()) %>% 
   filter(n == max(n)) %>% 
+  rename(Aisle = aisle, 
+         "Product Name" = product_name, 
+         "# Obs" = n) %>% 
   knitr::kable()
 ```
 
@@ -272,7 +278,7 @@ noaa_data %>%
   summarize(avg_snow = round(mean(snow, na.rm = TRUE), 4))
 ```
 
-```{r average daily temp plot in january and july, dpi = 300,fig.align = "center", fig.retina = 1, fig.asp = .6}
+```{r average daily temp plot in january and july, dpi = 300, fig.align = "center", fig.retina = 1, fig.asp = .6, out.width = "100%"}
 avg_daily_temp <- noaa_data %>%
   filter(month %in% c("January", "July")) %>%
   mutate(avg_temp = (tmin + tmax) / 2)
