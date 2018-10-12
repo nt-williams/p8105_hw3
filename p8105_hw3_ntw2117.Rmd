@@ -1,6 +1,8 @@
 ---
 title: "P8105: Homework 3"
-output: github_document
+output:  
+  github_document:
+  toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -234,7 +236,7 @@ numb_orders %>%
           panel.grid.minor = element_blank()) 
 ```
 
-Figure 3 shows the number of orders across all aisles, order from least to most. Fresh vegetables and fresh fruits are ordered most with `r max(numb_orders$n)` and `r numb_orders %>% filter(aisle == "fresh fruits") %>% select(n)` orders respectively. Followed by packaged vegetables and fruits. The least ordered items are those coming from the beauty aisle, `r min(numb_orders$n)` orders. 
+Figure 3 shows the number of orders across all aisles, order from least to most. Fresh vegetables and fresh fruits are ordered most with `r max(numb_orders$n)` and `r numb_orders %>% filter(aisle == "fresh fruits") %>% select(n)` orders respectively. Followed by packaged vegetables and fruits. The least ordered items are those coming from the beauty aisle, `r min(numb_orders$n)` orders. While the plot is rather large, it is purposefully ordered such that aisles that are most ordered from are directly next to the x axis scale. In addition, by making a horizontal bar chart instead of vertical chart, the aisle names are more easily read than they would have been if they were angled on the x-axis. 
 
 ```{r most popular items in 3 aisles}
 insta_data %>% 
@@ -242,6 +244,7 @@ insta_data %>%
   group_by(aisle, product_name) %>% 
   summarize(n = n()) %>% 
   filter(n == max(n)) %>% 
+  arrange(desc(n)) %>%
   rename(Aisle = aisle, 
          "Product Name" = product_name, 
          "# Obs" = n) %>% 
