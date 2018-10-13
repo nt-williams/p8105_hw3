@@ -1,15 +1,13 @@
 ---
 title: "P8105: Homework 3"
-output:  
-  github_document:
-  toc: true
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
-theme_set(theme_bw(base_size = 8))
+theme_set(theme_bw(base_size = 9))
 ```
 
 ## Problem 1
@@ -64,7 +62,7 @@ brfss_data %>%
          y = "Number of Locations") + 
     theme(legend.position = "bottom", 
           legend.direction = "horizontal", 
-          legend.key.width = unit(.125, "in")) + 
+          legend.key.width = unit(.1, "in")) + 
     guides(color = guide_legend(ncol = 17))
 ```
 
@@ -173,7 +171,7 @@ excel_dist <- avg_response_year_state %>%
     labs(y = "", x = "Response proportion") +
     viridis::scale_fill_viridis(name = "Year",
                                 discrete = TRUE, 
-                                option = "magma") + 
+                                option = "magma") +  
     theme(legend.position = "bottom",
           legend.direction = "horizontal", 
           panel.grid.major = element_blank(), 
@@ -214,14 +212,14 @@ insta_data$order_dow <- fct_relevel(insta_data$order_dow,
                                     "Saturday")
 ```
 
+The Instacart dataset contains information on online grocery store orders during the year 2017 from the online company Instacart. The dataset has `r nrow(insta_data)` observations and `r ncol(insta_data)` variables. Each observation is a product from an order. Important variables include product IDs/names, the number of times the user has reordered a product, day and time information for variables, and how long it has been since a users last order. There are `r insta_data %>% group_by(order_id) %>% distinct(order_id) %>% nrow()` distinct customer orders. 
+
 ```{r aisles information}
 numb_orders <- insta_data %>%
   group_by(aisle) %>%
   summarize(n = n()) %>%
   arrange(desc(n))
 ```
-
-There are `r insta_data %>% distinct(aisle_id) %>% count()` aisles in the dataset. 
 
 ```{r items ordered in each aisle, fig.height = 15, fig.align = "center", dpi = 300}
 numb_orders %>% 
@@ -236,7 +234,7 @@ numb_orders %>%
           panel.grid.minor = element_blank()) 
 ```
 
-Figure 3 shows the number of orders across all aisles, order from least to most. Fresh vegetables and fresh fruits are ordered most with `r max(numb_orders$n)` and `r numb_orders %>% filter(aisle == "fresh fruits") %>% select(n)` orders respectively. Followed by packaged vegetables and fruits. The least ordered items are those coming from the beauty aisle, `r min(numb_orders$n)` orders. While the plot is rather large, it is purposefully ordered such that aisles that are most ordered from are directly next to the x axis scale. In addition, by making a horizontal bar chart instead of vertical chart, the aisle names are more easily read than they would have been if they were angled on the x-axis. 
+There are `r insta_data %>% distinct(aisle_id) %>% count()` aisles in the dataset. Figure 3 shows the number of orders across all aisles, ordered from least to most. Fresh vegetables and fresh fruits are ordered most with `r max(numb_orders$n)` and `r numb_orders %>% filter(aisle == "fresh fruits") %>% select(n)` orders respectively. Followed by packaged vegetables and fruits. The least ordered items are those coming from the beauty aisle, `r min(numb_orders$n)` orders. While the plot is rather large, it is purposefully ordered such that aisles that are most ordered from are directly next to the x axis scale. In addition, by making a horizontal bar chart instead of vertical chart, the aisle names are more easily read than they would have been if they were angled on the x-axis. 
 
 ```{r most popular items in 3 aisles}
 insta_data %>% 
@@ -327,7 +325,8 @@ snow_1981_2010 <- noaa_data %>%
                                 discrete = TRUE) + 
     viridis::scale_color_viridis(name = "Year",
                                  discrete = TRUE, 
-                                 option = "inferno") + 
+                                 option = "cividis", 
+                                 direction = -1) + 
     labs(x = "Snowfall", 
          y = "Density") + 
     theme(legend.position = "bottom", 
