@@ -277,26 +277,19 @@ noaa_data <- p8105.datasets::ny_noaa %>%
 
 The NOAA dataset contains weather information for all five New York state weather stations from 1981 to 2010. The dataset has `r nrow(noaa_data)` observations and `r ncol(noaa_data)` variables. Each observation represents one day from 1981 to 2010 for one of the weather stations the corresponding data was collected at. The variables provide information on that days minimum temperature and maximum temperature in degrees celsius, the snowfall for that day in millimeters, the snowdepth for that day in millimeters, and the amount of precipitation for that day in millimeters. It is important to note that uncleaned dataset reported minimum daily temperature and maximum daily temperature in tenths of degrees celsius and precipitation in tenths of millimeters. However, these were converted to proper units for ease of interpretation. The present NOAA dataset contains large amounts of missing data. Of all observations, `r noaa_data %>% filter_all(any_vars(is.na(.))) %>% count()` contain at least one missing value. In addition, `r noaa_data %>% filter_at(vars(prcp:tmin), all_vars(is.na(.))) %>% count()` have missing values for all five key variables. 
 
-```{r average snow}
-noaa_data %>% 
-  group_by(month) %>% 
-  summarize(avg_snow = round(mean(snow, na.rm = TRUE), 4))
-```
+The average amount of snowfall is `r mean(noaa_data$snow, na.rm = TRUE)` mm. However, the median amount of snowfall is `r median(noaa_data$snow, na.rm = TRUE)` mm and the modal amount is `r noaa_data %>% group_by(snow) %>% summarize(n = n()) %>% filter(n == max(n)) %>% .$snow` mm. The difference between the average amount of snowfall and the median indicates snowfall is right-skewed. This makes sense as most days out of a year there is no snowfall, but a couple of days will experience large amounts. 
 
 ```{r average daily temp plot in january and july, dpi = 300, fig.align = "center", fig.retina = 1, fig.asp = .6, out.width = "100%"}
-avg_daily_temp <- noaa_data %>%
-  filter(month %in% c("January", "July")) %>%
-  mutate(avg_temp = (tmin + tmax) / 2)
-
-avg_daily_temp %>% 
+noaa_data %>% 
   filter(month %in% c("January", "July")) %>% 
   group_by(year, month) %>% 
-  summarize(avg_temp = mean(avg_temp, na.rm = TRUE)) %>% 
+  summarize(avg_temp = mean(tmax, na.rm = TRUE)) %>% 
   ggplot(aes(x = year, y = avg_temp)) + 
     geom_line(color = "#7496D2", size = 1) + 
   facet_grid(~ month, 
              scales = "free") + 
-  labs(x = "Year", 
+  labs(title = "Figure 4: Average maximum temperature (°C) in January and July, 1981-2010", 
+       x = "Year", 
        y = "Average Daily Temperature (°C)") +
   theme(axis.text.x = element_text(angle = 45,
                                    vjust = 0.4), 
@@ -304,6 +297,8 @@ avg_daily_temp %>%
         strip.text = element_text(color = "white", 
                                   face = "bold"))
 ```
+
+Figure 4 shows the average maximum daily temperature in January and July from 1981-2010. The average max temperature in Jaunary tends to center around zero degrees while the temperature for July varies around 27 degrees. In addition, the average maximum temperature for January appears to have more variation compared to that of July. 
 
 ```{r snow and temperature plot, dpi = 300, out.width = "100%", fig.asp = .5, fig.align = "center", fig.height = 6}
 temp_hex <- noaa_data %>%
@@ -315,33 +310,46 @@ temp_hex <- noaa_data %>%
                                 option = "plasma") + 
     theme(legend.position = "bottom",  
           legend.key.height = unit(0.1, "in"), 
-          legend.key.width = unit(0.5, "in")) + 
-    labs(x = "Minimum Temperature", 
-         y = "Maximum Temperature") + 
+          legend.key.width = unit(0.5, "in"),
+          plot.title = element_text(size = 7)) + 
+    labs(title = "Hexagon density plot of daily minimum and maximum temperature (°C)",
+         x = "Minimum Temperature (°C)", 
+         y = "Maximum Temperature (°C)") + 
     scale_y_continuous(position = "right")
   
-snow_1981_2010 <- noaa_data %>%
+snow_density <- noaa_data %>%
   filter(snow > 0 & snow < 100) %>%
   mutate(year = as.factor(year)) %>%
-  ggplot(aes(x = snow, fill = year, color = year)) +
+  mutate(year_cat = fct_collapse(year, 
+                                 "1981-85" = c("1981", "1982", "1983", "1984", "1985"), 
+                                 "1986-90" = c("1986", "1987", "1988", "1989", "1990"), 
+                                 "1991-95" = c("1991", "1992", "1993", "1994", "1995"), 
+                                 "1996-00" = c("1996", "1997", "1998", "1999", "2000"), 
+                                 "2001-05" = c("2001", "2002", "2003", "2004", "2005"), 
+                                 "2006-10" = c("2006", "2007", "2008", "2009", "2010"))) %>% 
+  ggplot(aes(x = snow, fill = year_cat, color = year_cat)) +
   geom_density(alpha = 0.01) +
-    viridis::scale_fill_viridis(name = "Year", 
+    viridis::scale_fill_viridis(name = "Years", 
                                 discrete = TRUE) + 
-    viridis::scale_color_viridis(name = "Year",
+    viridis::scale_color_viridis(name = "Years",
                                  discrete = TRUE, 
-                                 option = "cividis", 
-                                 direction = -1) + 
-    labs(x = "Snowfall", 
+                                 option = "viridis") + 
+    labs(title = "Density plot of snowfall (mm), 1981-2010",
+         x = "Snowfall (mm)", 
          y = "Density") + 
     theme(legend.position = "bottom", 
           legend.direction = "horizontal", 
           legend.key.size = unit(0.1, "in"), 
-          legend.text = element_text(size = 6)) + 
-    guides(fill = guide_legend(ncol = 6))
+          legend.text = element_text(size = 6),
+          plot.title = element_text(size = 7))
 
-snow_1981_2010 + temp_hex
+snow_temp_plot <- snow_density + temp_hex
+
+wrap_elements(snow_temp_plot) + ggtitle("Figure 5: Density and hexagon plots")
 ```
 
+Figure 5 shows a density plot of snowfall (mm) from 1981 to 2010, for observations with snowfall greater than zero and less than 100, and a hexagon density plot of the daily minimum and maximum temperature for all observations. For the density plot, while the question asked for the distribution of snowfall separetely by year I decided that collapsing the years from 30 levels to 6 produced a better graphic and displayed the same information in a clearer manner. It can be seen that there are distinct peaks in density around 20, 25, 50, and 75 mm. However, one can also see that the heights of these peaks has decreased over each 5 year period. This might be indicative of increasing temperatures as the result of climate change resulting in less snowfall. 
 
+In the hexagon density plot on the right, a relative linear relationship can be observed between minimum temperature and maximum temperature. It appears that the highest density of observations occurs in the middle of the plot and in this area there is an even more distinct positive, linear relationship. 
 
 
