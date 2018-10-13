@@ -1,5 +1,6 @@
 ---
 title: "P8105: Homework 3"
+author: "Nick Williams"
 output: github_document
 ---
 
