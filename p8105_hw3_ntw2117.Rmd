@@ -109,11 +109,10 @@ poor_dist <- avg_response_year_state %>%
                                 option = "magma",
                                 guide = FALSE) + 
     theme(axis.text.x = element_blank(), 
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) + 
-    labs(title = "Figure 2: Density plots of the proportion of different respones across states from 2002 to 2010", 
-         y = "", 
-         x = "")
+          panel.grid.minor = element_blank())
 
 fair_dist <- avg_response_year_state %>%
   filter(response == "Fair") %>%
@@ -127,9 +126,10 @@ fair_dist <- avg_response_year_state %>%
                                 option = "magma",
                                 guide = FALSE) + 
     theme(axis.text.x = element_blank(), 
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) + 
-    labs(y = "", x = "")
+          panel.grid.minor = element_blank())
 
 good_dist <- avg_response_year_state %>%
   filter(response == "Good") %>%
@@ -142,10 +142,11 @@ good_dist <- avg_response_year_state %>%
     viridis::scale_fill_viridis(discrete = TRUE, 
                                 option = "magma", 
                                 guide = FALSE) + 
-    theme(axis.text.x = element_blank(), 
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) +
-    labs(y = "", x = "") 
+          panel.grid.minor = element_blank()) 
 
 v_good_dist <- avg_response_year_state %>%
   filter(response == "Very good") %>%
@@ -159,9 +160,10 @@ v_good_dist <- avg_response_year_state %>%
                                 option = "magma",
                                 guide = FALSE) + 
     theme(axis.text.x = element_blank(), 
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) + 
-    labs(y = "", x = "")
+          panel.grid.minor = element_blank())
 
 excel_dist <- avg_response_year_state %>%
   filter(response == "Excellent") %>%
@@ -180,9 +182,11 @@ excel_dist <- avg_response_year_state %>%
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) + 
     guides(fill = guide_legend(ncol = 10)) 
-    
 
-poor_dist / fair_dist / good_dist / v_good_dist / excel_dist
+brfss_plot <- poor_dist / fair_dist / good_dist / v_good_dist / excel_dist
+    
+wrap_elements(brfss_plot) + 
+  ggtitle("Figure 2: Density plots of the proportion of different respones across states from 2002 to 2010")
 ```
 
 Figure 2 shows density plots of the different response categories from 2002 to 2010. Because all of the plots are on the same scale, you can observe the average increase in the proportion of responses from poor up to very good. After very good, the proportion of responses then slightly decreases for the excellent category. It also appears that the distributions within each category remains relatively constant, likely indicating that response does not vary over time. 
@@ -240,13 +244,14 @@ insta_data %>%
   arrange(desc(n)) %>% 
   mutate(aisle = forcats::fct_reorder(aisle, n, .desc = TRUE)) %>% 
   ggplot(aes(x = aisle, y = n)) + 
-  coord_flip() + 
-  geom_bar(stat = "identity", fill = "#a888bd") +
-    labs(title = "Figure 3: Number of orders across all aisles", 
-         y = "Number of Orders", 
+    coord_flip() + 
+    geom_bar(stat = "identity", fill = "#a888bd") +
+    labs(y = "Number of Orders", 
          x = "Aisle") + 
     theme(panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) 
+          panel.grid.minor = element_blank()) + 
+    ggtitle("Figure 3: Number of orders across all aisles")
+  
 ```
 
 There are `r insta_data %>% distinct(aisle_id) %>% count()` aisles in the dataset. Figure 3 shows the number of orders across all aisles, ordered from least to most. While the plot is rather large, it is purposefully ordered such that aisles that are most ordered from are directly next to the x axis scale. In addition, by making a horizontal bar chart instead of vertical chart, the aisle names are more easily read than they would have been if they were angled on the x-axis. 
@@ -294,7 +299,7 @@ noaa_data <- p8105.datasets::ny_noaa %>%
          year = as.integer(year))
 ```
 
-The NOAA dataset contains weather information for all five New York state weather stations from 1981 to 2010. The dataset has `r nrow(noaa_data)` observations and `r ncol(noaa_data)` variables. Each observation represents one day from 1981 to 2010 for one of the weather stations the corresponding data was collected at. The variables provide information on that days minimum temperature and maximum temperature in degrees celsius, the snowfall for that day in millimeters, the snowdepth for that day in millimeters, and the amount of precipitation for that day in millimeters. It is important to note that uncleaned dataset reported minimum daily temperature and maximum daily temperature in tenths of degrees celsius and precipitation in tenths of millimeters. However, these were converted to proper units for ease of interpretation. The present NOAA dataset contains large amounts of missing data. Of all observations, `r noaa_data %>% filter_all(any_vars(is.na(.))) %>% count()` contain at least one missing value. In addition, `r noaa_data %>% filter_at(vars(prcp:tmin), all_vars(is.na(.))) %>% count()` have missing values for all five key variables. 
+The NOAA dataset contains weather information for all five New York state weather stations from 1981 to 2010. The dataset has `r nrow(noaa_data)` observations and `r ncol(noaa_data)` variables. Each observation represents one day from 1981 to 2010 for one of the weather stations the corresponding data was collected at. The variables provide information on that days minimum temperature and maximum temperature in degrees celsius, the snowfall for that day in millimeters, the snowdepth for that day in millimeters, and the amount of precipitation for that day in millimeters. It is important to note that uncleaned dataset reported minimum daily temperature and maximum daily temperature in tenths of degrees celsius and precipitation in tenths of millimeters. However, these were converted to proper units for ease of interpretation. The present NOAA dataset contains large amounts of missing data. Of all observations, `r round((noaa_data %>% filter_all(any_vars(is.na(.))) %>% count()) / nrow(noaa_data), 2) * 100`% contain at least one missing value. In addition, `r round((noaa_data %>% filter_at(vars(prcp:tmin), all_vars(is.na(.))) %>% count()) / nrow(noaa_data), 2) * 100`% have missing values for all five key variables. 
 
 #### Questions and plots
 
